@@ -35,6 +35,8 @@
 #include "h264bsd_byte_stream.h"
 #include "h264bsd_util.h"
 
+#include "stddef.h"
+
 /*------------------------------------------------------------------------------
     2. External compiler flags
 --------------------------------------------------------------------------------
@@ -229,7 +231,7 @@ u32 h264bsdExtractNalUnit(u8 *pByteStream, u32 len, strmData_t *pStrmData,
 
         /* (readPtr - writePtr) indicates number of "removed" emulation
          * prevention bytes -> subtract from stream buffer size */
-        pStrmData->strmBuffSize -= (u32)(readPtr - writePtr);
+        pStrmData->strmBuffSize -= (ptrdiff_t)(readPtr - writePtr);
     }
 
     return(HANTRO_OK);

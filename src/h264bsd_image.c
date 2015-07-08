@@ -93,7 +93,7 @@ void h264bsdWriteMacroblock(image_t *image, u8 *data)
 
     ASSERT(image);
     ASSERT(data);
-    ASSERT(!((u32)data&0x3));
+    ASSERT(!((size_t)data&0x3));
 
     width = image->width;
 
@@ -102,9 +102,9 @@ void h264bsdWriteMacroblock(image_t *image, u8 *data)
     lum = (u32*)image->luma;
     cb = (u32*)image->cb;
     cr = (u32*)image->cr;
-    ASSERT(!((u32)lum&0x3));
-    ASSERT(!((u32)cb&0x3));
-    ASSERT(!((u32)cr&0x3));
+    ASSERT(!((size_t)lum&0x3));
+    ASSERT(!((size_t)cb&0x3));
+    ASSERT(!((size_t)cr&0x3));
 
     ptr = (u32*)data;
 
@@ -192,7 +192,7 @@ void h264bsdWriteOutputBlocks(image_t *image, u32 mbNum, u8 *data,
     ASSERT(image);
     ASSERT(data);
     ASSERT(mbNum < image->width * image->height);
-    ASSERT(!((u32)data&0x3));
+    ASSERT(!((size_t)data&0x3));
 
     /* Image size in macroblocks */
     picWidth = image->width;
@@ -219,8 +219,8 @@ void h264bsdWriteOutputBlocks(image_t *image, u32 mbNum, u8 *data,
         tmp = data + y*16 + x;
         imageBlock = lum + y*picWidth + x;
 
-        ASSERT(!((u32)tmp&0x3));
-        ASSERT(!((u32)imageBlock&0x3));
+        ASSERT(!((size_t)tmp&0x3));
+        ASSERT(!((size_t)imageBlock&0x3));
 
         if (IS_RESIDUAL_EMPTY(pRes))
         {
@@ -293,8 +293,8 @@ void h264bsdWriteOutputBlocks(image_t *image, u32 mbNum, u8 *data,
         tmp += y*8 + x;
         imageBlock += y*picWidth + x;
 
-        ASSERT(!((u32)tmp&0x3));
-        ASSERT(!((u32)imageBlock&0x3));
+        ASSERT(!((size_t)tmp&0x3));
+        ASSERT(!((size_t)imageBlock&0x3));
 
         if (IS_RESIDUAL_EMPTY(pRes))
         {

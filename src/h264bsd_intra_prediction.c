@@ -628,6 +628,8 @@ u32 h264bsdIntra16x16Prediction(mbStorage_t *pMb, u8 *data, i32 residual[][16],
                                 u8 *above, u8 *left, u32 constrainedIntraPred)
 {
 
+  printf("h264bsdIntra16x16Prediction 2 called\n");
+  
 /* Variables */
 
     u32 i;
@@ -1860,7 +1862,7 @@ void Write4x4To16x16(u8 *data, u8 *data4x4, u32 blockNum)
 
     data += y*16+x;
 
-    ASSERT(((u32)data&0x3) == 0);
+    ASSERT(((size_t)data&0x3) == 0);
 
     /*lint --e(826) */
     out32 = (u32 *)data;

@@ -29,6 +29,8 @@
 #ifndef H264SWDEC_UTIL_H
 #define H264SWDEC_UTIL_H
 
+#define _ERROR_PRINT
+
 /*------------------------------------------------------------------------------
     1. Include headers
 ------------------------------------------------------------------------------*/
@@ -150,7 +152,7 @@
 }
 
 #define ALIGN(ptr, bytePos) \
-        (ptr + ( ((bytePos - (int)ptr) & (bytePos - 1)) / sizeof(*ptr) ))
+        (ptr + ( ((size_t)((size_t)bytePos - (size_t)ptr) & (size_t)((size_t)bytePos - 1)) / (size_t)sizeof(*ptr) ))
 
 extern const u32 h264bsdQpC[52];
 

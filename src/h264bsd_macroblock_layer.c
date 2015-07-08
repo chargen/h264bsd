@@ -61,6 +61,8 @@
 #include "armVC.h"
 #endif /* H264DEC_OMXDL */
 
+#include "stddef.h"
+
 /*------------------------------------------------------------------------------
     2. External compiler flags
 --------------------------------------------------------------------------------
@@ -230,7 +232,7 @@ u32 h264bsdDecodeMacroblockLayer(strmData_t *pStrmData,
                 pMbLayer->mbType, pMbLayer->codedBlockPattern);
 
             pStrmData->strmBuffReadBits =
-                (u32)(pStrmData->pStrmCurrPos - pStrmData->pStrmBuffStart) * 8 +
+                (ptrdiff_t)(pStrmData->pStrmCurrPos - pStrmData->pStrmBuffStart) * 8 +
                 pStrmData->bitPosInWord;
 
             if (tmp != HANTRO_OK)
