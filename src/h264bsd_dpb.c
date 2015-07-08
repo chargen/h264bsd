@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- * Modified for use by h264bsd standalone library
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1014,7 +1013,7 @@ u32 h264bsdInitDpb(
     ALLOCATE(dpb->buffer, MAX_NUM_REF_IDX_L0_ACTIVE + 1, dpbPicture_t);
     if (dpb->buffer == NULL)
         return(MEMORY_ALLOCATION_ERROR);
-    memset(dpb->buffer, 0,
+    H264SwDecMemset(dpb->buffer, 0,
             (MAX_NUM_REF_IDX_L0_ACTIVE + 1)*sizeof(dpbPicture_t));
     for (i = 0; i < dpb->dpbSize + 1; i++)
     {
@@ -1036,7 +1035,7 @@ u32 h264bsdInitDpb(
     if (dpb->list == NULL || dpb->outBuf == NULL)
         return(MEMORY_ALLOCATION_ERROR);
 
-    memset(dpb->list, 0,
+    H264SwDecMemset(dpb->list, 0,
             ((MAX_NUM_REF_IDX_L0_ACTIVE + 1) * sizeof(dpbPicture_t*)) );
 
     dpb->numOut = dpb->outIndex = 0;

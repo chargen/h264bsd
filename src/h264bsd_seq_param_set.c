@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- * Modified for use by h264bsd standalone library
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,7 +92,7 @@ u32 h264bsdDecodeSeqParamSet(strmData_t *pStrmData, seqParamSet_t *pSeqParamSet)
     ASSERT(pStrmData);
     ASSERT(pSeqParamSet);
 
-    memset(pSeqParamSet, 0, sizeof(seqParamSet_t));
+    H264SwDecMemset(pSeqParamSet, 0, sizeof(seqParamSet_t));
 
     /* profile_idc */
     tmp = h264bsdGetBits(pStrmData, 8);

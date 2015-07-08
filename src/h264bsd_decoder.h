@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- * Modified for use by h264bsd standalone library
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +33,6 @@
 ------------------------------------------------------------------------------*/
 
 #include "basetype.h"
-
 #include "h264bsd_storage.h"
 
 /*------------------------------------------------------------------------------
@@ -55,8 +53,6 @@ enum {
     3. Data types
 ------------------------------------------------------------------------------*/
 
-
-
 /*------------------------------------------------------------------------------
     4. Function prototypes
 ------------------------------------------------------------------------------*/
@@ -66,10 +62,8 @@ u32 h264bsdDecode(storage_t *pStorage, u8 *byteStrm, u32 len, u32 picId,
     u32 *readBytes);
 void h264bsdShutdown(storage_t *pStorage);
 
-u8* h264bsdNextOutputPicture(storage_t *pStorage, u32 *picId, u32 *isIdrPic, u32 *numErrMbs);
-u32* h264bsdNextOutputPictureRGBA(storage_t *pStorage, u32 *picId, u32 *isIdrPic, u32 *numErrMbs);
-u32* h264bsdNextOutputPictureBGRA(storage_t *pStorage, u32 *picId, u32 *isIdrPic, u32 *numErrMbs);
-u32* h264bsdNextOutputPictureYCbCrA(storage_t *pStorage, u32 *picId, u32 *isIdrPic, u32 *numErrMbs);
+u8* h264bsdNextOutputPicture(storage_t *pStorage, u32 *picId, u32 *isIdrPic,
+    u32 *numErrMbs);
 
 u32 h264bsdPicWidth(storage_t *pStorage);
 u32 h264bsdPicHeight(storage_t *pStorage);
@@ -84,13 +78,6 @@ u32 h264bsdCheckValidParamSets(storage_t *pStorage);
 void h264bsdFlushBuffer(storage_t *pStorage);
 
 u32 h264bsdProfile(storage_t *pStorage);
-
-storage_t* h264bsdAlloc();
-void h264bsdFree(storage_t *pStorage);
-
-void h264bsdConvertToRGBA(u32 width, u32 height, u8* data, u32 *pOutput);
-void h264bsdConvertToBGRA(u32 width, u32 height, u8* data, u32 *pOutput);
-void h264bsdConvertToYCbCrA(u32 width, u32 height, u8* data, u32 *pOutput);
 
 #endif /* #ifdef H264SWDEC_DECODER_H */
 

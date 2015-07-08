@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- * Modified for use by h264bsd standalone library
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -174,21 +173,9 @@ u32 h264bsdConceal(storage_t *pStorage, image_t *currImage, u32 sliceType)
     {
         if ( (IS_I_SLICE(sliceType) && (pStorage->intraConcealmentFlag == 0)) ||
              refData == NULL)
-        {
-            memset(currImage->data, 128, width*height*384);
-        }
+            H264SwDecMemset(currImage->data, 128, width*height*384);
         else
-        {
-#ifndef FLASCC
-            memcpy(currImage->data, refData, width*height*384);
-#else
-            int ii = 0;
-            int size = width*height*384;
-            u8* curr_data = currImage->data;
-            for (ii = 0; ii < size;ii++)
-                curr_data[i] = refData[i];
-#endif
-        }
+            H264SwDecMemcpy(currImage->data, refData, width*height*384);
 
         pStorage->numConcealedMbs = pStorage->picSizeInMbs;
 
@@ -280,7 +267,7 @@ u32 ConcealMb(mbStorage_t *pMb, image_t *currImage, u32 row, u32 col,
     i32 firstPhase[16];
     i32 *pTmp;
     /* neighbours above, below, left and right */
-    i32 a[4], b[4], l[4], r[4];
+    i32 a[4] = { 0,0,0,0 }, b[4], l[4] = { 0,0,0,0 }, r[4];
     u32 A, B, L, R;
 #ifdef H264DEC_OMXDL
     u8 fillBuff[32*21 + 15 + 32];
@@ -317,7 +304,7 @@ u32 ConcealMb(mbStorage_t *pMb, image_t *currImage, u32 row, u32 col,
     pMb->chromaQpIndexOffset = 0;
 
     if (IS_I_SLICE(sliceType))
-        memset(data, 0, sizeof(data));
+        H264SwDecMemset(data, 0, sizeof(data));
     else
     {
         mv_t mv = {0,0};
@@ -340,10 +327,10 @@ u32 ConcealMb(mbStorage_t *pMb, image_t *currImage, u32 row, u32 col,
             return(HANTRO_OK);
         }
         else
-            memset(data, 0, sizeof(data));
+            H264SwDecMemset(data, 0, sizeof(data));
     }
 
-    memset(firstPhase, 0, sizeof(firstPhase));
+    H264SwDecMemset(firstPhase, 0, sizeof(firstPhase));
 
     /* counter for number of neighbours used */
     j = 0;
@@ -471,7 +458,7 @@ u32 ConcealMb(mbStorage_t *pMb, image_t *currImage, u32 row, u32 col,
     for (comp = 0; comp < 2; comp++)
     {
 
-        memset(firstPhase, 0, sizeof(firstPhase));
+        H264SwDecMemset(firstPhase, 0, sizeof(firstPhase));
 
         /* counter for number of neighbours used */
         j = 0;

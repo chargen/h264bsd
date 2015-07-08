@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- * Modified for use by h264bsd standalone library
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -187,7 +186,7 @@ u32 h264bsdMoreRbspData(strmData_t *pStrmData)
         return(HANTRO_FALSE);
 
     if ( (bits > 8) ||
-         ((h264bsdShowBits32(pStrmData)>>(32-bits)) != (1 << (bits-1))) )
+         ((h264bsdShowBits32(pStrmData)>>(32-bits)) != (1ul << (bits-1))) )
         return(HANTRO_TRUE);
     else
         return(HANTRO_FALSE);
@@ -221,7 +220,7 @@ u32 h264bsdNextMbAddress(u32 *pSliceGroupMap, u32 picSizeInMbs, u32 currMbAddr)
 
 /* Variables */
 
-    u32 i, sliceGroup, tmp;
+    u32 i, sliceGroup;
 
 /* Code */
 
@@ -232,11 +231,9 @@ u32 h264bsdNextMbAddress(u32 *pSliceGroupMap, u32 picSizeInMbs, u32 currMbAddr)
     sliceGroup = pSliceGroupMap[currMbAddr];
 
     i = currMbAddr + 1;
-    tmp = pSliceGroupMap[i];
-    while ((i < picSizeInMbs) && (tmp != sliceGroup))
+    while ((i < picSizeInMbs) && (pSliceGroupMap[i] != sliceGroup))
     {
         i++;
-        tmp = pSliceGroupMap[i];
     }
 
     if (i == picSizeInMbs)
@@ -283,3 +280,5 @@ void h264bsdSetCurrImageMbPointers(image_t *image, u32 mbNum)
     image->cb = (u8*)(image->data + picSize * 256 + tmp * 64 + col * 8);
     image->cr = (u8*)(image->cb + picSize * 64);
 }
+
+

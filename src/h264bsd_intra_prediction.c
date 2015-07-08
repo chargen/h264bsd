@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- * Modified for use by h264bsd standalone library
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -155,10 +154,6 @@ const u8 h264bsdClip[1280] =
     255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
     255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255
 };
-
-u8 *get_h264bsdClip() {
-    return (u8*)h264bsdClip;
-}
 
 #ifndef H264DEC_OMXDL
 /*------------------------------------------------------------------------------
@@ -628,8 +623,6 @@ u32 h264bsdIntra16x16Prediction(mbStorage_t *pMb, u8 *data, i32 residual[][16],
                                 u8 *above, u8 *left, u32 constrainedIntraPred)
 {
 
-  printf("h264bsdIntra16x16Prediction 2 called\n");
-  
 /* Variables */
 
     u32 i;
@@ -1117,7 +1110,7 @@ void Intra16x16PlanePrediction(u8 *data, u8 *above, u8 *left)
 
 /* Variables */
 
-    u32 i, j;
+    i32 i, j;
     i32 a, b, c;
     i32 tmp;
 
@@ -1130,20 +1123,20 @@ void Intra16x16PlanePrediction(u8 *data, u8 *above, u8 *left)
     a = 16 * (above[15] + left[15]);
 
     for (i = 0, b = 0; i < 8; i++)
-        b += ((i32)i + 1) * (above[8+i] - above[6-i]);
+        b += (i + 1) * (above[8+i] - above[6-i]);
     b = (5 * b + 32) >> 6;
 
     for (i = 0, c = 0; i < 7; i++)
-        c += ((i32)i + 1) * (left[8+i] - left[6-i]);
+        c += (i + 1) * (left[8+i] - left[6-i]);
     /* p[-1,-1] has to be accessed through above pointer */
-    c += ((i32)i + 1) * (left[8+i] - above[-1]);
+    c += (i + 1) * (left[8+i] - above[-1]);
     c = (5 * c + 32) >> 6;
 
     for (i = 0; i < 16; i++)
     {
         for (j = 0; j < 16; j++)
         {
-            tmp = (a + b * ((i32)j - 7) + c * ((i32)i - 7) + 16) >> 5;
+            tmp = (a + b * (j - 7) + c * (i - 7) + 16) >> 5;
             data[i*16+j] = (u8)CLIP1(tmp);
         }
     }
@@ -1862,7 +1855,7 @@ void Write4x4To16x16(u8 *data, u8 *data4x4, u32 blockNum)
 
     data += y*16+x;
 
-    ASSERT(((size_t)data&0x3) == 0);
+    ASSERT(((u32)data&0x3) == 0);
 
     /*lint --e(826) */
     out32 = (u32 *)data;

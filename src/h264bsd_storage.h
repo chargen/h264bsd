@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- * Modified for use by h264bsd standalone library
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,7 +71,7 @@ typedef struct
 } aubCheck_t;
 
 /* storage data structure, holds all data of a decoder instance */
-typedef struct storage
+typedef struct
 {
     /* active paramet set ids and pointers */
     u32 oldSpsId;
@@ -147,8 +146,6 @@ typedef struct storage
                               HEADERS_RDY to the user */
     u32 intraConcealmentFlag; /* 0 gray picture for corrupted intra
                                  1 previous frame used if available */
-    u32* conversionBuffer; // used to perform yuv conversion
-    size_t conversionBufferSize;
 } storage_t;
 
 /*------------------------------------------------------------------------------

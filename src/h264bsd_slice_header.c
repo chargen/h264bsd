@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- * Modified for use by h264bsd standalone library
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,6 +46,8 @@
 #include "h264bsd_vlc.h"
 #include "h264bsd_nal_unit.h"
 #include "h264bsd_dpb.h"
+
+#define UNUSED(x) (void)(x)
 
 /*------------------------------------------------------------------------------
     2. External compiler flags
@@ -114,7 +115,7 @@ u32 h264bsdDecodeSliceHeader(strmData_t *pStrmData, sliceHeader_t *pSliceHeader,
             pNalUnit->nalUnitType == NAL_CODED_SLICE_IDR );
 
 
-    memset(pSliceHeader, 0, sizeof(sliceHeader_t));
+    H264SwDecMemset(pSliceHeader, 0, sizeof(sliceHeader_t));
 
     picSizeInMbs = pSeqParamSet->picWidthInMbs * pSeqParamSet->picHeightInMbs;
     tmp = h264bsdDecodeExpGolombUnsigned(pStrmData, &value);
@@ -1408,6 +1409,7 @@ u32 h264bsdCheckPriorPicsFlag(u32 * noOutputOfPriorPicsFlag,
     u32 tmp, value, i;
     i32 ivalue;
     strmData_t tmpStrmData[1];
+    UNUSED(nalUnitType);
 
 /* Code */
 

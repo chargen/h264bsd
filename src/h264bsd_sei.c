@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- * Modified for use by h264bsd standalone library
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -193,7 +192,7 @@ u32 h264bsdDecodeSeiMessage(
     ASSERT(pSeiMessage);
 
 
-    memset(pSeiMessage, 0, sizeof(seiMessage_t));
+    H264SwDecMemset(pSeiMessage, 0, sizeof(seiMessage_t));
 
     do
     {
@@ -995,7 +994,7 @@ static u32 DecodeDecRefPicMarkingRepetition(
 
     /* frame_mbs_only_flag assumed always true so some field related syntax
      * elements are skipped, see H.264 standard */
-    // tmp = h264bsdDecRefPicMarking(pStrmData,
+    //tmp = h264bsdDecRefPicMarking(pStrmData,
     //  &pDecRefPicMarkingRepetition->decRefPicMarking, NAL_SEI, numRefFrames);
     return(HANTRO_NOK);
 

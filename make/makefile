@@ -10,8 +10,8 @@ LOPT =
 #CPPOPT = -m32 -c -fpermissive 
 #LOPT = -m32
 
-$(TARGET_BIN) : h264bsd_byte_stream.o h264bsd_cavlc.o h264bsd_conceal.o h264bsd_deblocking.o h264bsd_decoder.o h264bsd_dpb.o h264bsd_image.o h264bsd_inter_prediction.o h264bsd_intra_prediction.o h264bsd_macroblock_layer.o h264bsd_nal_unit.o h264bsd_neighbour.o h264bsd_pic_order_cnt.o h264bsd_pic_param_set.o h264bsd_reconstruct.o h264bsd_sei.o h264bsd_seq_param_set.o h264bsd_slice_data.o h264bsd_slice_group_map.o h264bsd_slice_header.o h264bsd_storage.o h264bsd_stream.o h264bsd_transform.o h264bsd_util.o h264bsd_vlc.o h264bsd_vui.o main.o
-	$(CPP) -o $(TARGET_BIN) h264bsd_intra_prediction.o h264bsd_byte_stream.o h264bsd_cavlc.o h264bsd_conceal.o h264bsd_deblocking.o h264bsd_decoder.o h264bsd_dpb.o h264bsd_image.o h264bsd_inter_prediction.o h264bsd_macroblock_layer.o h264bsd_nal_unit.o h264bsd_neighbour.o h264bsd_pic_order_cnt.o h264bsd_pic_param_set.o h264bsd_reconstruct.o h264bsd_sei.o h264bsd_seq_param_set.o h264bsd_slice_data.o h264bsd_slice_group_map.o h264bsd_slice_header.o h264bsd_storage.o h264bsd_stream.o h264bsd_transform.o h264bsd_util.o h264bsd_vlc.o h264bsd_vui.o main.o $(LOPT)
+$(TARGET_BIN) : h264bsd_byte_stream.o h264bsd_cavlc.o h264bsd_conceal.o h264bsd_deblocking.o h264bsd_decoder.o h264bsd_dpb.o h264bsd_image.o h264bsd_inter_prediction.o h264bsd_intra_prediction.o h264bsd_macroblock_layer.o h264bsd_nal_unit.o h264bsd_neighbour.o h264bsd_pic_order_cnt.o h264bsd_pic_param_set.o h264bsd_reconstruct.o h264bsd_sei.o h264bsd_seq_param_set.o h264bsd_slice_data.o h264bsd_slice_group_map.o h264bsd_slice_header.o h264bsd_storage.o h264bsd_stream.o h264bsd_transform.o h264bsd_util.o h264bsd_vlc.o h264bsd_vui.o H264SwDecApi.o TestBenchMultipleInstance.o
+	$(CPP) -o $(TARGET_BIN) h264bsd_intra_prediction.o h264bsd_byte_stream.o h264bsd_cavlc.o h264bsd_conceal.o h264bsd_deblocking.o h264bsd_decoder.o h264bsd_dpb.o h264bsd_image.o h264bsd_inter_prediction.o h264bsd_macroblock_layer.o h264bsd_nal_unit.o h264bsd_neighbour.o h264bsd_pic_order_cnt.o h264bsd_pic_param_set.o h264bsd_reconstruct.o h264bsd_sei.o h264bsd_seq_param_set.o h264bsd_slice_data.o h264bsd_slice_group_map.o h264bsd_slice_header.o h264bsd_storage.o h264bsd_stream.o h264bsd_transform.o h264bsd_util.o h264bsd_vlc.o h264bsd_vui.o H264SwDecApi.o TestBenchMultipleInstance.o $(LOPT)
 
 clean :
 	rm -rf *.{o,gcda,gcno} $(TARGET_BIN)
@@ -93,6 +93,10 @@ h264bsd_vlc.o : ../src/h264bsd_vlc.c
 
 h264bsd_vui.o : ../src/h264bsd_vui.c
 	$(CC) $(COPT) ../src/h264bsd_vui.c
+    
+H264SwDecApi.o : ../src/H264SwDecApi.c
+	$(CC) $(COPT) ../src/H264SwDecApi.c
 
-main.o : main.cpp
-	$(CPP) $(CPPOPT) main.cpp
+
+TestBenchMultipleInstance.o : ../src/TestBenchMultipleInstance.c
+	$(CC) $(COPT) ../src/TestBenchMultipleInstance.c

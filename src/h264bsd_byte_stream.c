@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- * Modified for use by h264bsd standalone library
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,8 +33,6 @@
 
 #include "h264bsd_byte_stream.h"
 #include "h264bsd_util.h"
-
-#include "stddef.h"
 
 /*------------------------------------------------------------------------------
     2. External compiler flags
@@ -231,7 +228,7 @@ u32 h264bsdExtractNalUnit(u8 *pByteStream, u32 len, strmData_t *pStrmData,
 
         /* (readPtr - writePtr) indicates number of "removed" emulation
          * prevention bytes -> subtract from stream buffer size */
-        pStrmData->strmBuffSize -= (ptrdiff_t)(readPtr - writePtr);
+        pStrmData->strmBuffSize -= (u32)(readPtr - writePtr);
     }
 
     return(HANTRO_OK);

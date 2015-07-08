@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- * Modified for use by h264bsd standalone library
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -157,7 +156,7 @@ u32 h264bsdDecodeSliceData(strmData_t *pStrmData, storage_t *pStorage,
                 if (skipRun)
                 {
                     prevSkipped = HANTRO_TRUE;
-                    memset(&mbLayer->mbPred, 0, sizeof(mbPred_t));
+                    H264SwDecMemset(&mbLayer->mbPred, 0, sizeof(mbPred_t));
                     /* mark current macroblock skipped */
                     mbLayer->mbType = P_Skip;
                 }

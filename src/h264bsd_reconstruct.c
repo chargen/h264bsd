@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- * Modified for use by h264bsd standalone library
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +41,8 @@
 #include "omxVC.h"
 #include "armVC.h"
 #endif /* H264DEC_OMXDL */
+
+#define UNUSED(x) (void)(x)
 
 /*------------------------------------------------------------------------------
     2. External compiler flags
@@ -2137,35 +2138,12 @@ static void FillRow1(
   i32 center,
   i32 right)
 {
-#ifndef FLASCC
+    UNUSED(left);
+    UNUSED(right);
     ASSERT(ref);
     ASSERT(fill);
 
-    memcpy(fill, ref, center);
-#else
-    int i = 0;    
-    u8 *pdest = (u8*) fill;
-    u8 *psrc = (u8*) ref;
-    int loops = (center / sizeof(u32));
-
-    ASSERT(ref);
-    ASSERT(fill);
-
-    for(i = 0; i < loops; ++i)
-    {
-        *((u32*)pdest) = *((u32*)psrc);
-        pdest += sizeof(u32);
-        psrc += sizeof(u32);
-    }
-
-    loops = (center % sizeof(u32));
-    for (i = 0; i < loops; ++i)
-    {
-        *pdest = *psrc;
-        ++pdest;
-        ++psrc;
-    }
-#endif
+    H264SwDecMemcpy(fill, ref, (u32)center);
 
     /*lint -e(715) */
 }
@@ -2310,58 +2288,27 @@ void h264bsdFillBlock(
     bottom = ystop > (i32)height ? ystop - (i32)height : 0;
     y = (i32)blockHeight - top - bottom;
 
-    if (x0 >= 0 && xstop <= (i32)width)
-    {
-        for ( ; top; top-- )
-        {
-            FillRow1(ref, fill, left, x, right);
-            fill += fillScanLength;
-        }
-        for ( ; top; top-- )
-        {
-            FillRow1(ref, fill, left, x, right);            
-        }
-        for ( ; y; y-- )
-        {
-            FillRow1(ref, fill, left, x, right);
-            ref += width;
-            fill += fillScanLength;
-        }
-    }
-    else
-    {
-        for ( ; top; top-- )
-        {
-            h264bsdFillRow7(ref, fill, left, x, right);
-            fill += fillScanLength;
-        }
-        for ( ; top; top-- )
-        {
-            h264bsdFillRow7(ref, fill, left, x, right);            
-        }
-        for ( ; y; y-- )
-        {
-            h264bsdFillRow7(ref, fill, left, x, right);
-            ref += width;
-            fill += fillScanLength;
-        }
-    }
     /* Top-overfilling */
-    
+    for ( ; top; top-- )
+    {
+        (*fp)(ref, fill, left, x, right);
+        fill += fillScanLength;
+    }
 
     /* Lines inside reference image */
-    
+    for ( ; y; y-- )
+    {
+        (*fp)(ref, fill, left, x, right);
+        ref += width;
+        fill += fillScanLength;
+    }
 
     ref -= width;
 
     /* Bottom-overfilling */
     for ( ; bottom; bottom-- )
     {
-        //(*fp)(ref, fill, left, x, right);
-        if (x0 >= 0 && xstop <= (i32)width)
-            FillRow1(ref, fill, left, x, right);
-        else
-            h264bsdFillRow7(ref, fill, left, x, right);
+        (*fp)(ref, fill, left, x, right);
         fill += fillScanLength;
     }
 }

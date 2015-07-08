@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- * Modified for use by h264bsd standalone library
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +41,7 @@
 /*------------------------------------------------------------------------------
     1. Include headers
 ------------------------------------------------------------------------------*/
+
 #include "h264bsd_decoder.h"
 #include "h264bsd_nal_unit.h"
 #include "h264bsd_byte_stream.h"
@@ -54,7 +54,6 @@
 #include "h264bsd_dpb.h"
 #include "h264bsd_deblocking.h"
 #include "h264bsd_conceal.h"
-#include "h264bsd_storage.h"
 
 /*------------------------------------------------------------------------------
     2. External compiler flags
@@ -102,7 +101,7 @@ u32 h264bsdInit(storage_t *pStorage, u32 noOutputReordering)
      * specific NEON optimized "memset" for clearing the structure */
     size = (sizeof(macroblockLayer_t) + 63) & ~0x3F;
 
-    pStorage->mbLayer = (macroblockLayer_t*)malloc(size);
+    pStorage->mbLayer = (macroblockLayer_t*)H264SwDecMalloc(size);
     if (!pStorage->mbLayer)
         return HANTRO_NOK;
 
@@ -476,7 +475,7 @@ u32 h264bsdDecode(storage_t *pStorage, u8 *byteStrm, u32 len, u32 picId,
 
         h264bsdResetStorage(pStorage);
 
-         picOrderCnt = h264bsdDecodePicOrderCnt(pStorage->poc,
+        picOrderCnt = h264bsdDecodePicOrderCnt(pStorage->poc,
             pStorage->activeSps, pStorage->sliceHeader, pStorage->prevNalUnit);
 
         if (pStorage->validSliceInAccessUnit)
@@ -568,8 +567,6 @@ void h264bsdShutdown(storage_t *pStorage)
     FREE(pStorage->mb);
     FREE(pStorage->sliceGroupMap);
 
-    if(pStorage->conversionBuffer != NULL) FREE(pStorage->conversionBuffer);
-
     h264bsdFreeDpb(pStorage->dpb);
 
 }
@@ -609,7 +606,7 @@ u8* h264bsdNextOutputPicture(storage_t *pStorage, u32 *picId, u32 *isIdrPic,
     ASSERT(pStorage);
 
     pOut = h264bsdDpbOutputPicture(pStorage->dpb);
-    
+
     if (pOut != NULL)
     {
         *picId = pOut->picId;
@@ -620,133 +617,6 @@ u8* h264bsdNextOutputPicture(storage_t *pStorage, u32 *picId, u32 *isIdrPic,
     else
         return(NULL);
 
-}
-
-
-/*------------------------------------------------------------------------------
-
-    Function: h264bsdNextOutputPictureRGBA
-
-        Functional description:
-            Get next output picture in display order, converted to RGBA.
-            RGBA is the color format most commonly used by OpenGL.
-
-        Inputs:
-            pStorage    pointer to storage data structure
-
-        Outputs:
-            picId       identifier of the picture will be stored here
-            isIdrPic    IDR flag of the picture will be stored here
-            numErrMbs   number of concealed macroblocks in the picture
-                        will be stored here
-
-        Returns:
-            pointer to the picture data
-            NULL if no pictures available for display
-
-------------------------------------------------------------------------------*/
-u32* h264bsdNextOutputPictureRGBA(storage_t *pStorage, u32 *picId, u32 *isIdrPic, u32 *numErrMbs)
-{
-    u32 width = h264bsdPicWidth(pStorage) * 16;
-    u32 height = h264bsdPicHeight(pStorage) * 16;
-    u8* data = h264bsdNextOutputPicture(pStorage, picId, isIdrPic, numErrMbs);
-    size_t rgbSize = sizeof(u32) * width * height;
-
-    if(data == NULL) return NULL;
-
-    if(pStorage->conversionBufferSize < rgbSize)
-    {
-        if(pStorage->conversionBuffer != NULL) free(pStorage->conversionBuffer);
-        pStorage->conversionBufferSize = rgbSize;
-        pStorage->conversionBuffer = (u32*)malloc(rgbSize);
-    }
-
-    h264bsdConvertToRGBA(width, height, data, pStorage->conversionBuffer);
-    return pStorage->conversionBuffer;
-}
-
-/*------------------------------------------------------------------------------
-
-    Function: h264bsdNextOutputPictureRGBA
-
-        Functional description:
-            Get next output picture in display order, converted to BGRA.
-            BGRA is the color format most commonly used by Windows.
-
-        Inputs:
-            pStorage    pointer to storage data structure
-
-        Outputs:
-            picId       identifier of the picture will be stored here
-            isIdrPic    IDR flag of the picture will be stored here
-            numErrMbs   number of concealed macroblocks in the picture
-                        will be stored here
-
-        Returns:
-            pointer to the picture data
-            NULL if no pictures available for display
-
-------------------------------------------------------------------------------*/
-u32* h264bsdNextOutputPictureBGRA(storage_t *pStorage, u32 *picId, u32 *isIdrPic, u32 *numErrMbs)
-{
-    u32 width = h264bsdPicWidth(pStorage) * 16;
-    u32 height = h264bsdPicHeight(pStorage) * 16;
-    u8* data = h264bsdNextOutputPicture(pStorage, picId, isIdrPic, numErrMbs);
-    size_t rgbSize = sizeof(u32) * width * height;
-
-    if(data == NULL) return NULL;
-
-    if(pStorage->conversionBufferSize < rgbSize)
-    {
-        if(pStorage->conversionBuffer != NULL) free(pStorage->conversionBuffer);
-        pStorage->conversionBufferSize = rgbSize;
-        pStorage->conversionBuffer = (u32*)malloc(rgbSize);
-    }
-
-    h264bsdConvertToBGRA(width, height, data, pStorage->conversionBuffer);
-    return pStorage->conversionBuffer;
-}
-
-/*------------------------------------------------------------------------------
-
-    Function: h264bsdNextOutputPictureYCbCrA
-
-        Functional description:
-            Get next output picture in display order, converted to YCbCrA.
-            YCbCrA is a 4:4:4 format that uses u32 pixels where the MSB is alpha.
-
-        Inputs:
-            pStorage    pointer to storage data structure
-
-        Outputs:
-            picId       identifier of the picture will be stored here
-            isIdrPic    IDR flag of the picture will be stored here
-            numErrMbs   number of concealed macroblocks in the picture
-                        will be stored here
-
-        Returns:
-            pointer to the picture data
-            NULL if no pictures available for display
-
-------------------------------------------------------------------------------*/
-u32* h264bsdNextOutputPictureYCbCrA(storage_t *pStorage, u32 *picId, u32 *isIdrPic, u32 *numErrMbs)
-{
-    u32 width = h264bsdPicWidth(pStorage) * 16;
-    u32 height = h264bsdPicHeight(pStorage) * 16;
-    u8* data = h264bsdNextOutputPicture(pStorage, picId, isIdrPic, numErrMbs);
-    size_t rgbSize = sizeof(u32) * width * height;
-
-    if(data == NULL) return NULL;
-
-    if(pStorage->conversionBufferSize < rgbSize)
-    {
-        if(pStorage->conversionBuffer != NULL) free(pStorage->conversionBuffer);
-        pStorage->conversionBufferSize = rgbSize;
-        pStorage->conversionBuffer = (u32*)malloc(rgbSize);
-    }
-
-    h264bsdConvertToYCbCrA(width, height, data, pStorage->conversionBuffer);
-    return pStorage->conversionBuffer;
 }
 
 /*------------------------------------------------------------------------------
@@ -1089,282 +959,3 @@ u32 h264bsdProfile(storage_t *pStorage)
         return 0;
 }
 
-/*------------------------------------------------------------------------------
-
-    Function name: h264bsdAlloc
-
-        Functional description:
-            Allocate storage for a decoder
-
-        Inputs:
-            none
-
-        Outputs:
-            none
-
-        Returns:
-            pStorage            pointer to uninitialized storage structure
-
-------------------------------------------------------------------------------*/
-
-storage_t* h264bsdAlloc()
-{
-    return (storage_t*)malloc(sizeof(storage_t));
-}
-
-/*------------------------------------------------------------------------------
-
-    Function name: h264bsdFree
-
-        Functional description:
-            Free storage for a decoder
-
-        Inputs:
-            pStorage            pointer to storage structure
-
-        Outputs:
-            none
-
-        Returns:
-            none
-
-------------------------------------------------------------------------------*/
-
-void h264bsdFree(storage_t *pStorage)
-{
-    free(pStorage);
-}
-
-/*------------------------------------------------------------------------------
-
-    Function: h264bsdConvertToRGBA
-
-        Functional description:
-            Convert decoded image data RGBA format.
-            RGBA is the color format most commonly used by OpenGL.
-            RGBA format uses u32 pixels where the MSB is alpha.
-            *Note* While this function is available, it is not heavily optimized.
-            If possible, you should use decoded image data directly. 
-            This function should only be used when there is no other way to get RGBA data.
-
-        Inputs:
-            width       width of the image in pixels
-            height      height of the image in pixels
-            data        pointer to decoded image data
-
-        Outputs:
-            pOutput     pointer to the buffer where the RGBA data will be written
-
-        Returns:
-            none
-
-------------------------------------------------------------------------------*/
-
-void h264bsdConvertToRGBA(u32 width, u32 height, u8* data, u32 *pOutput)
-{
-    const int w = (int)width;
-    const int h = (int)height;
-
-    int x = 0;
-    int y = 0;
-
-    size_t ySize = w * h;
-    size_t cbSize = w/2 * h/2;
-
-    u8* luma = data;
-    u8* cb = data + ySize;
-    u8* cr = data + ySize + cbSize;
-    u32* rgba = pOutput;
-
-    while(y < h)
-    {
-        int c = *luma - 16;
-        int d = *cb - 128;
-        int e = *cr - 128;
-
-        u32 r = (u32)CLIP1((298*c         + 409*e + 128) >> 8);
-        u32 g = (u32)CLIP1((298*c - 100*d - 208*e + 128) >> 8);
-        u32 b = (u32)CLIP1((298*c + 516*d         + 128) >> 8);
-
-        u32 pixel = 0xff;
-        pixel = (pixel << 8) + b;
-        pixel = (pixel << 8) + g;
-        pixel = (pixel << 8) + r;
-
-        *rgba = pixel;
-
-        ++x;
-        ++rgba;
-        ++luma;
-
-        if(!(x & 1))
-        {
-            ++cb;
-            ++cr;
-        }
-
-        if(x < w) continue;
-
-        x = 0;
-        ++y;
-
-        if(y & 1)
-        {
-            cb -= w/2;
-            cr -= w/2;
-        }
-    }
-}
-
-/*------------------------------------------------------------------------------
-
-    Function: h264bsdConvertToBGRA
-
-        Functional description:
-            Convert decoded image data BGRA format.
-            BGRA is the color format most commonly used by Windows.
-            BGRA format uses u32 pixels where the MSB is alpha.
-            *Note* While this function is available, it is not heavily optimized.
-            If possible, you should use decoded image data directly. 
-            This function should only be used when there is no other way to get BGRA data.
-
-        Inputs:
-            width       width of the image in pixels
-            height      height of the image in pixels
-            data        pointer to decoded image data
-
-        Outputs:
-            pOutput     pointer to the buffer where the BGRA data will be written
-
-        Returns:
-            none
-
-------------------------------------------------------------------------------*/
-
-void h264bsdConvertToBGRA(u32 width, u32 height, u8* data, u32 *pOutput)
-{
-    const int w = (int)width;
-    const int h = (int)height;
-
-    int x = 0;
-    int y = 0;
-
-    size_t ySize = w * h;
-    size_t cbSize = w/2 * h/2;
-
-    u8* luma = data;
-    u8* cb = data + ySize;
-    u8* cr = data + ySize + cbSize;
-    u32* bgra = pOutput;
-
-    while(y < h)
-    {
-        int c = *luma - 16;
-        int d = *cb - 128;
-        int e = *cr - 128;
-
-        u32 r = (u32)CLIP1((298*c         + 409*e + 128) >> 8);
-        u32 g = (u32)CLIP1((298*c - 100*d - 208*e + 128) >> 8);
-        u32 b = (u32)CLIP1((298*c + 516*d         + 128) >> 8);
-
-        u32 pixel = 0xff;
-        pixel = (pixel << 8) + r;
-        pixel = (pixel << 8) + g;
-        pixel = (pixel << 8) + b;
-
-        *bgra = pixel;
-
-        ++x;
-        ++bgra;
-        ++luma;
-
-        if(!(x & 1))
-        {
-            ++cb;
-            ++cr;
-        }
-
-        if(x < w) continue;
-
-        x = 0;
-        ++y;
-
-        if(y & 1)
-        {
-            cb -= w/2;
-            cr -= w/2;
-        }
-    }
-}
-
-/*------------------------------------------------------------------------------
-
-    Function: h264bsdConvertToYCbCrA
-
-        Functional description:
-            Convert decoded image data YCbCrA format.
-            YCbCrA is a 4:4:4 format that uses u32 pixels where the MSB is alpha.
-            *Note* While this function is available, it is not heavily optimized.
-            If possible, you should use decoded image data directly. 
-            This function should only be used when there is no other way to get YCbCrA data.
-
-        Inputs:
-            width       width of the image in pixels
-            height      height of the image in pixels
-            data        pointer to decoded image data
-
-        Outputs:
-            pOutput     pointer to the buffer where the YCbCrA data will be written
-
-        Returns:
-            none
-
-------------------------------------------------------------------------------*/
-
-void h264bsdConvertToYCbCrA(u32 width, u32 height, u8* data, u32 *pOutput)
-{
-    const int w = (int)width;
-    const int h = (int)height;
-
-    int x = 0;
-    int y = 0;
-
-    size_t ySize = w * h;
-    size_t cbSize = w/2 * h/2;
-
-    u8* luma = data;
-    u8* cb = data + ySize;
-    u8* cr = data + ySize + cbSize;
-    u32* yCbCr = pOutput;
-
-    while(y < h)
-    {
-        u32 pixel = 0xff;
-        pixel = (pixel << 8) + *cr;
-        pixel = (pixel << 8) + *cb;
-        pixel = (pixel << 8) + *luma;
-
-        *yCbCr = pixel;
-
-        ++x;
-        ++yCbCr;
-        ++luma;
-
-        if(!(x & 1))
-        {
-            ++cb;
-            ++cr;
-        }
-
-        if(x < w) continue;
-
-        x = 0;
-        ++y;
-
-        if(y & 1)
-        {
-            cb -= w/2;
-            cr -= w/2;
-        }
-    }
-}

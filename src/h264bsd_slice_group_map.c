@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- * Modified for use by h264bsd standalone library
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -526,7 +525,7 @@ void h264bsdDecodeSliceGroupMap(
     /* just one slice group -> all macroblocks belong to group 0 */
     if (pps->numSliceGroups == 1)
     {
-        memset(map, 0, picSize * sizeof(u32));
+        H264SwDecMemset(map, 0, picSize * sizeof(u32));
         return;
     }
 

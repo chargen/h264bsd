@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- * Modified for use by h264bsd standalone library
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -101,7 +100,7 @@ u32 h264bsdDecodePicParamSet(strmData_t *pStrmData, picParamSet_t *pPicParamSet)
     ASSERT(pPicParamSet);
 
 
-    memset(pPicParamSet, 0, sizeof(picParamSet_t));
+    H264SwDecMemset(pPicParamSet, 0, sizeof(picParamSet_t));
 
     tmp = h264bsdDecodeExpGolombUnsigned(pStrmData,
         &pPicParamSet->picParameterSetId);

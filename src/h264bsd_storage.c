@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- * Modified for use by h264bsd standalone library
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,7 +92,7 @@ void h264bsdInitStorage(storage_t *pStorage)
 
     ASSERT(pStorage);
 
-    memset(pStorage, 0, sizeof(storage_t));
+    H264SwDecMemset(pStorage, 0, sizeof(storage_t));
 
     pStorage->activeSpsId = MAX_NUM_SEQ_PARAM_SETS;
     pStorage->activePpsId = MAX_NUM_PIC_PARAM_SETS;
@@ -349,7 +348,7 @@ u32 h264bsdActivateParamSets(storage_t *pStorage, u32 ppsId, u32 isIdr)
         if (pStorage->mb == NULL || pStorage->sliceGroupMap == NULL)
             return(MEMORY_ALLOCATION_ERROR);
 
-        memset(pStorage->mb, 0,
+        H264SwDecMemset(pStorage->mb, 0,
             pStorage->picSizeInMbs * sizeof(mbStorage_t));
 
         h264bsdInitMbNeighbours(pStorage->mb,

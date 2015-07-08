@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- * Modified for use by h264bsd standalone library
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,8 +59,6 @@
 #include "omxVC.h"
 #include "armVC.h"
 #endif /* H264DEC_OMXDL */
-
-#include "stddef.h"
 
 /*------------------------------------------------------------------------------
     2. External compiler flags
@@ -152,7 +149,7 @@ u32 h264bsdDecodeMacroblockLayer(strmData_t *pStrmData,
 #ifdef H264DEC_NEON
     h264bsdClearMbLayer(pMbLayer, ((sizeof(macroblockLayer_t) + 63) & ~0x3F));
 #else
-    memset(pMbLayer, 0, sizeof(macroblockLayer_t));
+    H264SwDecMemset(pMbLayer, 0, sizeof(macroblockLayer_t));
 #endif
 
     tmp = h264bsdDecodeExpGolombUnsigned(pStrmData, &value);
@@ -232,7 +229,7 @@ u32 h264bsdDecodeMacroblockLayer(strmData_t *pStrmData,
                 pMbLayer->mbType, pMbLayer->codedBlockPattern);
 
             pStrmData->strmBuffReadBits =
-                (ptrdiff_t)(pStrmData->pStrmCurrPos - pStrmData->pStrmBuffStart) * 8 +
+                (u32)(pStrmData->pStrmCurrPos - pStrmData->pStrmBuffStart) * 8 +
                 pStrmData->bitPosInWord;
 
             if (tmp != HANTRO_OK)
@@ -1034,7 +1031,7 @@ u32 h264bsdDecodeMacroblock(mbStorage_t *pMb, macroblockLayer_t *pMbLayer,
 #endif
         if (mbType != P_Skip)
         {
-            memcpy(pMb->totalCoeff,
+            H264SwDecMemcpy(pMb->totalCoeff,
                             pMbLayer->residual.totalCoeff,
                             27*sizeof(*pMb->totalCoeff));
 
@@ -1103,7 +1100,7 @@ u32 h264bsdDecodeMacroblock(mbStorage_t *pMb, macroblockLayer_t *pMbLayer,
         }
         else
         {
-            memset(pMb->totalCoeff, 0, 27*sizeof(*pMb->totalCoeff));
+            H264SwDecMemset(pMb->totalCoeff, 0, 27*sizeof(*pMb->totalCoeff));
             pMb->qpY = (u32)*qpY;
         }
 #ifdef H264DEC_OMXDL

@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- * Modified for use by h264bsd standalone library
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,26 +28,24 @@
 #ifndef H264SWDEC_UTIL_H
 #define H264SWDEC_UTIL_H
 
-#define _ERROR_PRINT
-
 /*------------------------------------------------------------------------------
     1. Include headers
 ------------------------------------------------------------------------------*/
-
-#include "basetype.h"
-#include "stddef.h"
-#include <stdint.h>
-#include "h264bsd_cfg.h"
-#include "h264bsd_stream.h"
-#include "h264bsd_image.h"
 
 #ifdef _ASSERT_USED
 #include <assert.h>
 #endif
 
+#include "H264SwDecApi.h"
+
 #if defined(_RANGE_CHECK) || defined(_DEBUG_PRINT) || defined(_ERROR_PRINT)
 #include <stdio.h>
 #endif
+
+#include <stdint.h>
+#include "basetype.h"
+#include "h264bsd_stream.h"
+#include "h264bsd_image.h"
 
 /*------------------------------------------------------------------------------
     2. Module defines
@@ -144,13 +141,13 @@
 /* macro to allocate memory */
 #define ALLOCATE(ptr, count, type) \
 { \
-    (ptr) = malloc((count) * sizeof(type)); \
+    (ptr) = H264SwDecMalloc((count) * sizeof(type)); \
 }
 
 /* macro to free allocated memory */
 #define FREE(ptr) \
 { \
-    free((ptr)); (ptr) = NULL; \
+    H264SwDecFree((ptr)); (ptr) = NULL; \
 }
 
 #define ALIGN(ptr, bytePos) \
@@ -177,9 +174,6 @@ u32 h264bsdMoreRbspData(strmData_t *strmData);
 u32 h264bsdNextMbAddress(u32 *pSliceGroupMap, u32 picSizeInMbs, u32 currMbAddr);
 
 void h264bsdSetCurrImageMbPointers(image_t *image, u32 mbNum);
-
-i32 abs(i32 a);
-i32 clip(i32 x, i32 y, i32 z);
 
 #endif /* #ifdef H264SWDEC_UTIL_H */
 
